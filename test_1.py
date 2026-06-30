@@ -13,7 +13,7 @@ done = False
 mode = "TRACKING"
 rrt_path = env.smooth_reference_path
 path_index = 0
-model = PPO.load("models/stac/best_model.zip")
+model = PPO.load("models/move/ppo_checkpoint_1280000_steps.zip")
 sim_step_counter = 0
 obstacle_triggered = False
 trigger_time = 50
@@ -22,13 +22,7 @@ while not done:
     if path_index >= len(rrt_path):
         print("机械臂已经成功走完所有全局路点，顺利抵达终点！")
         break
-    # min_dist_to_obs = env.get_vision_based_obstacle_dist()
-    min_dist_to_obs, phantom_obs_id = ut.get_vision_based_obstacle_dist(
-    env.camera,
-    env.robot,
-    env.baseline_depth,
-    phantom_obs_id)
-    # min_dist_to_obs = ut.get_dynamic_obstacle_dist(env.robot,env.scene.obstacle_ids)  # 障碍物距离
+    min_dist_to_obs = ut.get_dynamic_obstacle_dist(env.robot,env.scene.obstacle_ids)  # 障碍物距离
     q_current, _ = env.robot.get_joint_states()
     dist_to_path = np.linalg.norm(rrt_path[path_index:] - q_current, axis=1).min()
 
@@ -55,8 +49,7 @@ while not done:
             path_index += 1
         time.sleep(1 / 240.0)
         if not obstacle_triggered and sim_step_counter == trigger_time:
-            current_hand_pos, _ = env.robot.get_hand_pos()
-            env.scene._respawn_obstacle(current_hand_pos)
+            env.scene._respawn_obstacle()
             p.performCollisionDetection()
             obstacle_triggered = True
             print("突发障碍物已生成！")

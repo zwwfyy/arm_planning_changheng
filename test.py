@@ -11,7 +11,7 @@ env.render()
 time.sleep(2)
 scen = SceneManager()
 
-model = PPO.load("models/1/best_model.zip")
+model = PPO.load("models/move/best_model.zip")
 vis = Visualize()
 path = []
 success_time = 0
